@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetMap 3D — Интерактивный 3D-симулятор топологии сетей</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Стили -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/topology-hud.css">
+
+    <!-- Three.js и библиотеки пост-обработки (локальные копии) -->
+    <script src="libs/three.min.js"></script>
+    <script src="libs/OrbitControls.js"></script>
+    <script src="libs/EffectComposer.js"></script>
+    <script src="libs/RenderPass.js"></script>
+    <script src="libs/ShaderPass.js"></script>
+    <script src="libs/CopyShader.js"></script>
+    <script src="libs/LuminosityHighPassShader.js"></script>
+    <script src="libs/UnrealBloomPass.js"></script>
+</head>
+<body>
+    <div id="app-root">
+        <!-- ==========================================
+             ВЕРХНЯЯ ШАПКА НАВИГАЦИИ (TOPBAR)
+             ========================================== -->
+        <header class="topbar">
+            <div class="topbar-brand">
+                <div class="brand-logo-icon">◈</div>
+                <div class="brand-text-block">
+                    <span class="brand-title">NetMap 3D</span>
+                    <span class="brand-badge">PRO SIMULATOR</span>
+                </div>
+            </div>
+
+            <!-- Живые сетевые метрики текущей симуляции -->
+            <div class="topbar-metrics">
+                <div class="metric-item">
+                    <span class="metric-dot cyan"></span>
+                    <span>Устройства:</span>
+                    <span class="metric-value" id="hdr-stat-devices">0</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-dot green"></span>
+                    <span>Линки:</span>
+                    <span class="metric-value" id="hdr-stat-links">0</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-dot green"></span>
+                    <span>В сети:</span>
+                    <span class="metric-value" id="hdr-stat-online">0</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-dot purple"></span>
+                    <span>Трафик:</span>
+                    <span class="metric-value" id="hdr-stat-speed">0 Gbps</span>
+                </div>
+            </div>
+
+            <!-- Действия в шапке -->
+            <div class="topbar-actions">
+                <button class="btn-cyber btn-cyber-primary" id="btn-tool-connect" title="Соединить два устройства (Горячая клавиша C)">
+                    🔗 Соединить
+                </button>
+                <button class="btn-cyber btn-cyber-outline" id="btn-quick-save" title="Сохранить проект в LocalStorage">
+                    💾 Сохранить
+                </button>
+                <button class="btn-cyber btn-cyber-ghost btn-icon-only" id="btn-export-png" title="Сделать снимок топологии (PNG)">
+                    📸
+                </button>
+                <button class="btn-cyber btn-cyber-ghost btn-icon-only" id="btn-quick-audio" title="Звуковые эффекты">
+                    🔊
+                </button>
+                <button class="btn-cyber btn-cyber-ghost btn-icon-only" id="btn-fullscreen" title="Полноэкранный режим">
+                    ⛶
+                </button>
+            </div>
+        </header>
+
+        <!-- ==========================================
+             ОСНОВНОЙ КОНТЕЙНЕР ПРИЛОЖЕНИЯ
+             ========================================== -->
+        <div class="main-wrapper">
+            <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
+            <aside class="sidebar">
+                <div class="nav-group">
+                    <div class="nav-label">Навигация</div>
+                    <button class="nav-btn" data-view-target="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span>Панель управления</span>
+                    </button>
+                    <button class="nav-btn active" data-view-target="topology">
+                        <span class="nav-icon">🌐</span>
+                        <span>3D Топология</span>
+                    </button>
+                    <button class="nav-btn" data-view-target="devices">
+                        <span class="nav-icon">💻</span>
+                        <span>Устройства</span>
+                    </button>
+                    <button class="nav-btn" data-view-target="connections">
+                        <span class="nav-icon">⚡</span>
+                        <span>Соединения</span>
+                    </button>
+                    <button class="nav-btn" data-view-target="projects">
+                        <span class="nav-icon">📁</span>
+                        <span>Проекты</span>
+                    </button>
+                    <button class="nav-btn" data-view-target="settings">
+                        <span class="nav-icon">⚙</span>
+                        <span>Настройки</span>
+                    </button>
+                </div>
+
+                <div class="sidebar-footer">
+                    <div class="sidebar-sys-status">
+                        <span>Стек: Three.js r128</span>
+                        <span class="status-indicator online"></span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ОБЛАСТЬ КОНТЕНТА -->
+            <main class="content-area">
+                <!-- ==========================================
+                     1. ВИД 3D ТОПОЛОГИИ (3D TOPOLOGY)
+                     ========================================== -->
+                <section class="app-view active" id="view-topology">
+                    <!-- 3D Холст WebGL -->
+                    <div id="canvas-container"></div>
+
+                    <!-- Панель инструментов добавления оборудования (8 типов) -->
+                    <div class="device-toolbar">
+                        <button class="toolbar-device-btn" data-add-device="computer" title="Добавить Компьютер (ПК)">
+                            <span class="toolbar-icon">🖥</span>
+                            <span>ПК</span>
+                        </button>
+                        <button class="toolbar-device-btn" data-add-device="laptop" title="Добавить Ноутбук">
+                            <span class="toolbar-icon">💻</span>
+                            <span>Ноутбук</span>
+                        </button>
+                        <button class="toolbar-device-btn" data-add-device="router" title="Добавить Маршрутизатор (Router)">
+                            <span class="toolbar-icon">📡</span>
+                            <span>Роутер</span>
+                        </button>
+                        <button class="toolbar-device-btn" data-add-device="switch" title="Добавить Коммутатор (Switch)">
+                            <span class="toolbar-icon">🔀</span>
+                            <span>Свитч</span>
+                        </button>
+                        <button class="toolbar-device-btn" data-add-device="server" title="Добавить Вычислительный Сервер">
+                            <span class="toolbar-icon">🗄</span>
+                            <span>Сервер</span>
+                        </button>
+                        <button class="toolbar-device-btn" data-add-device="firewall" title="Добавить Межсетевой экран (Firewall)">
+                            <span class="toolbar-icon">🛡</span>
+                            <span>Фаервол</span>
+                        </button>
+                        <button class="toolbar-device-btn" data-add-device="cloud" title="Добавить Облачный шлюз (Cloud)">
+                            <span class="toolbar-icon">☁</span>
+                            <span>Облако</span>
+                        </button>
+                        <button class="toolbar-device-btn" data-add-device="database" title="Добавить Базу данных (Database)">
+                            <span class="toolbar-icon">💽</span>
+                            <span>База данных</span>
+                        </button>
+                    </div>
+
+                    <!-- Плашка режима интерактивного соединения -->
+                    <div class="connect-mode-banner" id="connect-mode-banner">
+                        <div class="connect-mode-indicator">
+                            <span class="status-indicator online"></span>
+                            <span id="connect-mode-text">Режим соединения: Выберите первое устройство</span>
+                        </div>
+                        <button class="btn-cancel-connect" id="btn-cancel-connect">Отмена (Esc)</button>
+                    </div>
+
+                    <!-- Кнопки управления камерой в 3D -->
+                    <div class="camera-controls-hud">
+                        <button class="btn-cam-ctrl" id="btn-reset-view" title="Сбросить ракурс камеры к центру (R)">🎯</button>
+                        <button class="btn-cam-ctrl" id="btn-view-top" title="Вид сверху (2D план)">📐</button>
+                        <button class="btn-cam-ctrl" id="btn-view-iso" title="Изометрический вид">🧊</button>
+                        <button class="btn-cam-ctrl" id="btn-view-rotate" title="Включить кинематографическое вращение">🔄</button>
+                    </div>
+
+                    <!-- Плавающий HUD симуляции пакетов -->
+                    <div class="simulation-hud-panel" id="simulation-hud">
+                        <div class="sim-hud-header">
+                            <span class="sim-hud-title">⚡ СИМУЛЯТОР ПАКЕТОВ</span>
+                        </div>
+                        <div class="sim-field">
+                            <label>Узел-источник (Source):</label>
+                            <select class="sim-select" id="sim-source"></select>
+                        </div>
+                        <div class="sim-field">
+                            <label>Узел-назначение (Destination):</label>
+                            <select class="sim-select" id="sim-target"></select>
+                        </div>
+                        <div class="sim-field">
+                            <label>Тип сетевого пакета:</label>
+                            <select class="sim-select" id="sim-protocol">
+                                <option value="ICMP Echo (Ping)">ICMP Echo (Ping)</option>
+                                <option value="TCP Handshake (SYN)">TCP Handshake (SYN)</option>
+                                <option value="HTTP GET /api/v1">HTTP GET /api/v1</option>
+                                <option value="DNS Query (UDP 53)">DNS Query (UDP 53)</option>
+                            </select>
+                        </div>
+                        <div class="sim-field">
+                            <label>Скорость симуляции:</label>
+                            <select class="sim-select" id="sim-speed">
+                                <option value="0.5">0.5x (Замедленно)</option>
+                                <option value="1.0" selected>1.0x (Нормально)</option>
+                                <option value="2.0">2.0x (Быстро)</option>
+                                <option value="4.0">4.0x (Турбо)</option>
+                            </select>
+                        </div>
+
+                        <div class="sim-hud-actions">
+                            <button class="btn-cyber btn-cyber-primary" id="btn-run-sim" style="flex: 2;">
+                                ▶ Запустить
+                            </button>
+                            <button class="btn-cyber btn-cyber-outline" id="btn-random-sim" style="flex: 1;" title="Случайный пинг (P)">
+                                Случайно
+                            </button>
+                            <button class="btn-cyber btn-cyber-ghost btn-icon-only" id="btn-clear-sim" title="Очистить симуляцию">
+                                ✕
+                            </button>
+                        </div>
+
+                        <!-- Телеметрия симуляции -->
+                        <div class="sim-telemetry-box">
+                            <div class="telemetry-row">
+                                <span class="telemetry-label">Статус:</span>
+                                <span class="telemetry-val" id="telemetry-status">В ожидании</span>
+                            </div>
+                            <div class="telemetry-row">
+                                <span class="telemetry-label">Число хопов:</span>
+                                <span class="telemetry-val" id="telemetry-hops">0</span>
+                            </div>
+                            <div class="telemetry-row">
+                                <span class="telemetry-label">Задержка RTT:</span>
+                                <span class="telemetry-val" id="telemetry-latency">0 мс</span>
+                            </div>
+                            <div class="telemetry-row">
+                                <span class="telemetry-label">Потери пакетов:</span>
+                                <span class="telemetry-val" id="telemetry-loss">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="sim-disclaimer">
+                            ⚠ Демонстрационные данные симуляции, не реальные сетевые замеры.
+                        </div>
+                    </div>
+
+                    <!-- Панель конфигурации выбранного устройства (Слайдер справа) -->
+                    <div class="device-config-panel" id="device-config-panel">
+                        <div class="config-header">
+                            <div>
+                                <h3 class="config-title">Конфигурация узла</h3>
+                                <span class="project-badge custom" id="cfg-type-badge">Устройство</span>
+                            </div>
+                            <button class="btn-close-config" id="btn-close-config">&times;</button>
+                        </div>
+                        <div class="config-body">
+                            <div class="form-group">
+                                <label for="cfg-name">Имя устройства:</label>
+                                <input type="text" id="cfg-name" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cfg-ip">IPv4 Адрес:</label>
+                                <input type="text" id="cfg-ip" class="form-input" placeholder="192.168.1.100">
+                                <div class="form-error" id="cfg-ip-error">Некорректный IP-адрес</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cfg-mac">MAC Адрес:</label>
+                                <input type="text" id="cfg-mac" class="form-input" placeholder="52:54:00:12:34:56">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="switch-label">
+                                    <span>Сетевой статус:</span>
+                                    <span class="status-badge" id="cfg-status-text">В сети</span>
+                                    <label class="switch-toggle">
+                                        <input type="checkbox" id="cfg-status-toggle" checked>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Координаты в 3D пространстве:</label>
+                                <div class="coords-row">
+                                    <input type="number" id="cfg-pos-x" class="form-input" placeholder="X" step="0.5">
+                                    <input type="number" id="cfg-pos-z" class="form-input" placeholder="Z" step="0.5">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Подключенные кабели:</label>
+                                <div class="cfg-connections-list" id="cfg-connections-list"></div>
+                            </div>
+                        </div>
+                        <div class="config-footer">
+                            <button class="btn-cyber btn-cyber-outline" id="btn-ping-from-node" style="flex: 1;">
+                                Отправить пинг
+                            </button>
+                            <button class="btn-cyber btn-cyber-danger" id="btn-delete-node" style="flex: 1;">
+                                Удалить узел
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Нижний кибер-терминал логов -->
+                    <div class="terminal-drawer" id="terminal-drawer">
+                        <div class="terminal-header" id="btn-toggle-terminal">
+                            <div class="terminal-title">
+                                <span>❯_</span>
+                                <span>КИБЕР-ТЕРМИНАЛ СОБЫТИЙ СЕТИ</span>
+                            </div>
+                            <div class="terminal-controls">
+                                <button class="terminal-btn" id="btn-clear-terminal">Очистить лог</button>
+                            </div>
+                        </div>
+                        <div class="terminal-content" id="terminal-content"></div>
+                    </div>
+
+                    <!-- Всплывающая подсказка 3D (Hover Tooltip) -->
+                    <div class="node-tooltip" id="node-tooltip"></div>
+                </section>
+
+                <!-- ==========================================
+                     2. ПАНЕЛЬ УПРАВЛЕНИЯ (DASHBOARD)
+                     ========================================== -->
+                <section class="app-view" id="view-dashboard">
+                    <div class="view-container">
+                        <div class="view-header">
+                            <div class="view-title-block">
+                                <h1>Панель управления сетью</h1>
+                                <p>Комплексная телеметрия, состояние здоровья и аналитика структуры топологии</p>
+                            </div>
+                            <button class="btn-cyber btn-cyber-primary" id="btn-dash-check-health">
+                                🩺 Проверить здоровье сети
+                            </button>
+                        </div>
+
+                        <!-- Сетка метрик -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-card-title">Всего оборудования</div>
+                                <div class="stat-card-value" id="dash-stat-devices">0</div>
+                                <div class="stat-card-desc">Все типы сетевых узлов</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-title">Активных линков</div>
+                                <div class="stat-card-value" id="dash-stat-links">0</div>
+                                <div class="stat-card-desc">Коммутационные каналы связи</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-title">Узлов онлайн</div>
+                                <div class="stat-card-value" id="dash-stat-online" style="color: var(--neon-green);">0</div>
+                                <div class="stat-card-desc">Функционируют штатно</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-title">Узлов офлайн</div>
+                                <div class="stat-card-value" id="dash-stat-offline" style="color: var(--neon-red);">0</div>
+                                <div class="stat-card-desc">Требуют внимания / изолированы</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-title">Пропускная способность</div>
+                                <div class="stat-card-value" id="dash-stat-bandwidth">0 Гбит/с</div>
+                                <div class="stat-card-desc">Суммарная емкость магистралей</div>
+                            </div>
+                        </div>
+
+                        <!-- Секции аналитики -->
+                        <div class="dashboard-sections-grid">
+                            <!-- Левая колонка -->
+                            <div class="dash-panel">
+                                <div class="dash-panel-title">
+                                    <span>Структура и распределение оборудования</span>
+                                </div>
+                                <div id="dash-device-breakdown"></div>
+                            </div>
+
+                            <!-- Правая колонка -->
+                            <div class="dash-panel">
+                                <div class="dash-panel-title">
+                                    <span>Индекс здоровья сети</span>
+                                </div>
+                                <div class="health-meter-container">
+                                    <div class="health-meter-header">
+                                        <span>Доступность топологии</span>
+                                        <span id="dash-health-percent">100%</span>
+                                    </div>
+                                    <div class="health-meter-bar">
+                                        <div class="health-meter-fill" id="dash-health-progress"></div>
+                                    </div>
+                                </div>
+
+                                <div class="dash-panel-title" style="margin-top: 24px;">
+                                    <span>Диагностика связности</span>
+                                </div>
+                                <div id="dash-isolated-alert"></div>
+                                <button class="btn-cyber btn-cyber-outline" id="btn-dash-find-isolated" style="width: 100%; margin-top: 8px;">
+                                    Найти изолированные узлы
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     3. СПИСОК УСТРОЙСТВ (DEVICES)
+                     ========================================== -->
+                <section class="app-view" id="view-devices">
+                    <div class="view-container">
+                        <div class="view-header">
+                            <div class="view-title-block">
+                                <h1>Сетевые устройства (<span id="devices-count-badge">0</span>)</h1>
+                                <p>Полная инвентаризация оборудования, IP-адресов и статусов онлайн</p>
+                            </div>
+                        </div>
+
+                        <div class="cyber-table-container">
+                            <div class="cyber-table-toolbar">
+                                <div class="search-box">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" id="devices-search-input" class="search-input" placeholder="Поиск по имени, IP, MAC или типу...">
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <select id="devices-status-filter" class="sim-select" style="width: 160px;">
+                                        <option value="all">Все статусы</option>
+                                        <option value="online">Только В сети</option>
+                                        <option value="offline">Только Офлайн</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">Статус</th>
+                                        <th>Устройство</th>
+                                        <th>IPv4 Адрес</th>
+                                        <th>MAC-адрес</th>
+                                        <th>Связи</th>
+                                        <th>Координаты</th>
+                                        <th style="text-align: right;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="devices-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     4. СПИСОК СОЕДИНЕНИЙ (CONNECTIONS)
+                     ========================================== -->
+                <section class="app-view" id="view-connections">
+                    <div class="view-container">
+                        <div class="view-header">
+                            <div class="view-title-block">
+                                <h1>Кабельные соединения (<span id="connections-count-badge">0</span>)</h1>
+                                <p>Управление физическими и оптическими линиями связи и моделирование разрывов</p>
+                            </div>
+                            <button class="btn-cyber btn-cyber-primary" id="btn-add-connection-modal">
+                                ➕ Новое соединение
+                            </button>
+                        </div>
+
+                        <div class="cyber-table-container">
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">Линк</th>
+                                        <th>Узел А (Источник)</th>
+                                        <th style="width: 50px; text-align: center;">Тракт</th>
+                                        <th>Узел Б (Назначение)</th>
+                                        <th>Пропускная способность</th>
+                                        <th style="text-align: right;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="connections-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     5. МЕНЕДЖЕР ПРОЕКТОВ (PROJECTS)
+                     ========================================== -->
+                <section class="app-view" id="view-projects">
+                    <div class="view-container">
+                        <div class="view-header">
+                            <div class="view-title-block">
+                                <h1>Проекты и топологии</h1>
+                                <p>Сохранение в локальное хранилище браузера (LocalStorage), готовые шаблоны и экспорт JSON</p>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-cyber btn-cyber-primary" id="btn-save-project">
+                                    💾 Сохранить текущий
+                                </button>
+                                <button class="btn-cyber btn-cyber-outline" id="btn-new-project">
+                                    ➕ Новый чистый
+                                </button>
+                                <button class="btn-cyber btn-cyber-ghost" id="btn-export-json">
+                                    ⬇ Экспорт JSON
+                                </button>
+                                <label class="btn-cyber btn-cyber-ghost" style="cursor: pointer;">
+                                    ⬆ Импорт JSON
+                                    <input type="file" id="input-import-json" accept=".json" style="display: none;">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="projects-grid" id="projects-grid"></div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     6. НАСТРОЙКИ (SETTINGS)
+                     ========================================== -->
+                <section class="app-view" id="view-settings">
+                    <div class="view-container" style="max-width: 800px;">
+                        <div class="view-header">
+                            <div class="view-title-block">
+                                <h1>Настройки системы</h1>
+                                <p>Конфигурация графического рендерера, спецэффектов и звука</p>
+                            </div>
+                        </div>
+
+                        <div class="dash-panel">
+                            <div class="dash-panel-title">Графика и 3D-эффекты</div>
+                            <div class="form-group">
+                                <label class="switch-label">
+                                    <span>Эффект неонового свечения (Post-processing Bloom):</span>
+                                    <label class="switch-toggle">
+                                        <input type="checkbox" id="setting-bloom-toggle" checked>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="switch-label">
+                                    <span>Отображение кибернетической координатной сетки пола:</span>
+                                    <label class="switch-toggle">
+                                        <input type="checkbox" id="setting-grid-toggle" checked>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-particles-density">Плотность парящих частиц данных:</label>
+                                <select id="setting-particles-density" class="sim-select">
+                                    <option value="high" selected>Высокая (400 частиц)</option>
+                                    <option value="medium">Умеренная (200 частиц)</option>
+                                    <option value="off">Отключить частицы</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dash-panel">
+                            <div class="dash-panel-title">Звуковое сопровождение (Web Audio API)</div>
+                            <div class="form-group">
+                                <label class="switch-label">
+                                    <span>Процедурные звуковые эффекты:</span>
+                                    <label class="switch-toggle">
+                                        <input type="checkbox" id="setting-sound-toggle" checked>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-sound-volume">Громкость звуковых эффектов:</label>
+                                <input type="range" id="setting-sound-volume" min="0" max="1" step="0.05" value="0.3" style="width: 100%;">
+                            </div>
+                        </div>
+
+                        <div class="dash-panel" style="border-color: rgba(239, 68, 68, 0.3);">
+                            <div class="dash-panel-title" style="color: #f87171;">Сброс и восстановление данных</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                                Очищает все сохраненные проекты в LocalStorage и восстанавливает начальную кампусную сеть университета.
+                            </p>
+                            <button class="btn-cyber btn-cyber-danger" id="btn-reset-storage">
+                                Сбросить локальные данные
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Контейнер для всплывающих тост-уведомлений -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Главный ES Module скрипт -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

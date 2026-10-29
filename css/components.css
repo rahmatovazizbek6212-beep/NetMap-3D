@@ -1,0 +1,607 @@
+/**
+ * NetMap 3D — Компоненты UI (кнопки, карточки, таблицы, формы, бейджи, тосты)
+ */
+
+/* ===================================================
+   КИБЕР-КНОПКИ (BUTTONS)
+   =================================================== */
+.btn-cyber {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-cyber-primary {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.9), rgba(0, 168, 255, 0.9));
+    color: #060913;
+    border: 1px solid var(--neon-cyan);
+    box-shadow: 0 0 16px var(--neon-cyan-glow);
+}
+.btn-cyber-primary:hover {
+    background: linear-gradient(135deg, #00f3ff, #38bdf8);
+    box-shadow: 0 0 24px rgba(0, 243, 255, 0.6);
+    transform: translateY(-1px);
+}
+
+.btn-cyber-outline {
+    background: rgba(0, 243, 255, 0.06);
+    color: var(--neon-cyan);
+    border: 1px solid var(--border-neon);
+}
+.btn-cyber-outline:hover {
+    background: rgba(0, 243, 255, 0.16);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px var(--neon-cyan-glow);
+}
+
+.btn-cyber-danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+.btn-cyber-danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: var(--neon-red);
+    box-shadow: 0 0 14px var(--neon-red-glow);
+}
+
+.btn-cyber-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
+}
+.btn-cyber-ghost:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-icon-only {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 6px;
+}
+
+/* ===================================================
+   КАРТОЧКИ АНАЛИТИКИ И СТАТИСТИКИ (CARDS)
+   =================================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-neon);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -10px rgba(0, 243, 255, 0.3);
+    border-color: var(--border-neon-strong);
+}
+
+.stat-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.stat-card-value {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.stat-card-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Сетка дашборда */
+.dashboard-sections-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+@media (max-width: 900px) {
+    .dashboard-sections-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dash-panel {
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.dash-panel-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Прогресс-бар здоровья */
+.health-meter-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.health-meter-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.health-meter-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.health-meter-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green-glow);
+    transition: width 0.5s ease;
+}
+
+/* Полоски распределения оборудования */
+.dash-breakdown-row {
+    margin-bottom: 12px;
+}
+.dash-breakdown-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+.dash-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.dash-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+    border-radius: 3px;
+}
+
+/* Диагностические элементы */
+.dash-diagnostic-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+.dash-diagnostic-item.success {
+    background: rgba(0, 255, 157, 0.08);
+    border: 1px solid rgba(0, 255, 157, 0.25);
+    color: #6ee7b7;
+}
+.dash-diagnostic-item.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fcd34d;
+}
+
+/* ===================================================
+   КИБЕР-ТАБЛИЦЫ (TABLES)
+   =================================================== */
+.cyber-table-container {
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-neon);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.cyber-table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 280px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    background: var(--bg-glass-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+.search-input:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan-glow);
+}
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+}
+
+.cyber-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.cyber-table th {
+    padding: 12px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    background: rgba(6, 11, 24, 0.4);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.cyber-table td {
+    padding: 14px 18px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.cyber-table tr:hover td {
+    background: rgba(0, 243, 255, 0.03);
+}
+
+.table-empty {
+    text-align: center;
+    padding: 60px 20px !important;
+    color: var(--text-muted);
+}
+
+/* Действия в таблице */
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-tbl-action {
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-tbl-action:hover {
+    background: rgba(0, 243, 255, 0.15);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+.btn-tbl-action.btn-delete-row:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: var(--neon-red);
+    color: var(--neon-red);
+}
+
+/* Ячейка устройства */
+.device-cell {
+    display: flex;
+    flex-direction: column;
+}
+.device-cell-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.device-cell-type {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Селектор скорости линка в таблице */
+.select-link-speed {
+    background: var(--bg-glass-input);
+    color: var(--neon-cyan);
+    border: 1px solid var(--border-subtle);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.select-link-speed:hover, .select-link-speed:focus {
+    border-color: var(--neon-cyan);
+}
+
+/* ===================================================
+   ПРОЕКТЫ (PROJECT CARDS)
+   =================================================== */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.project-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-neon);
+    border-radius: 12px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+.project-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 8px 24px -8px var(--neon-cyan-glow);
+}
+.project-card.active {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 16px var(--neon-green-glow);
+}
+
+.project-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.project-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.project-badge.preset {
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--neon-purple);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+}
+.project-badge.custom {
+    background: rgba(0, 243, 255, 0.15);
+    color: var(--neon-cyan);
+    border: 1px solid var(--border-neon);
+}
+
+.project-current-badge {
+    color: var(--neon-green);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.project-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.project-card-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    flex: 1;
+}
+
+.project-card-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.project-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-proj-action {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid var(--border-neon);
+    color: var(--neon-cyan);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-proj-action:hover {
+    background: var(--neon-cyan);
+    color: #060913;
+}
+.btn-proj-action.btn-delete-proj {
+    flex: 0 0 36px;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+.btn-proj-action.btn-delete-proj:hover {
+    background: var(--neon-red);
+    color: #fff;
+}
+.btn-proj-action.btn-rename-proj {
+    flex: 0 0 36px;
+}
+
+/* ===================================================
+   СИСТЕМА ВСПЛЫВАЮЩИХ УВЕДОМЛЕНИЙ (TOASTS)
+   =================================================== */
+.toast-container {
+    position: fixed;
+    top: 68px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 420px;
+    padding: 12px 16px;
+    background: rgba(11, 18, 33, 0.92);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border-radius: 8px;
+    border-left: 4px solid var(--neon-cyan);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    color: var(--text-primary);
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast-success { border-left-color: var(--neon-green); }
+.toast-warning { border-left-color: var(--neon-amber); }
+.toast-error { border-left-color: var(--neon-red); }
+
+.toast-icon {
+    font-size: 16px;
+    font-weight: bold;
+}
+.toast-success .toast-icon { color: var(--neon-green); }
+.toast-warning .toast-icon { color: var(--neon-amber); }
+.toast-error .toast-icon { color: var(--neon-red); }
+
+.toast-body {
+    flex: 1;
+    font-size: 13px;
+}
+
+.toast-close {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+}
+.toast-close:hover {
+    color: #fff;
+}
+
+.animate-slide-in {
+    animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-slide-out {
+    animation: slideInRight 0.25s reverse cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ===================================================
+   ПЕРЕКЛЮЧАТЕЛИ (SWITCHES) И ПОЛЗУНКИ
+   =================================================== */
+.switch-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 14px;
+    cursor: pointer;
+}
+
+.switch-toggle {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+}
+.switch-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 22px;
+    transition: 0.3s;
+}
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+input:checked + .switch-slider {
+    background-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan-glow);
+}
+input:checked + .switch-slider:before {
+    transform: translateX(20px);
+    background-color: #060913;
+}

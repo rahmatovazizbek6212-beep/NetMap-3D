@@ -1,0 +1,21 @@
+{
+  "name": "netmap-3d",
+  "version": "2.5.0",
+  "description": "NetMap 3D — Интерактивный 3D-симулятор топологии компьютерных сетей",
+  "main": "index.html",
+  "scripts": {
+    "start": "python serve.py",
+    "serve": "npx serve . -p 8080"
+  },
+  "keywords": [
+    "network",
+    "topology",
+    "threejs",
+    "3d",
+    "simulator",
+    "packet-tracing",
+    "cyberpunk"
+  ],
+  "author": "NetMap 3D Team",
+  "license": "MIT"
+}

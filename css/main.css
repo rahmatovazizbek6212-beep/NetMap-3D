@@ -1,0 +1,134 @@
+/**
+ * NetMap 3D — Базовые стили и дизайн-система Cyber-Tech Glassmorphism
+ */
+
+:root {
+    --bg-dark: #060913;
+    --bg-surface: #0a0f1d;
+    --bg-panel: rgba(11, 18, 33, 0.78);
+    --bg-panel-hover: rgba(16, 26, 48, 0.88);
+    --bg-card: rgba(15, 23, 42, 0.65);
+    --bg-glass-input: rgba(6, 11, 24, 0.7);
+
+    --neon-cyan: #00f3ff;
+    --neon-cyan-glow: rgba(0, 243, 255, 0.35);
+    --neon-blue: #3b82f6;
+    --neon-blue-glow: rgba(59, 130, 246, 0.35);
+    --neon-purple: #a855f7;
+    --neon-purple-glow: rgba(168, 85, 247, 0.35);
+    --neon-green: #00ff9d;
+    --neon-green-glow: rgba(0, 255, 157, 0.35);
+    --neon-red: #ef4444;
+    --neon-red-glow: rgba(239, 68, 68, 0.35);
+    --neon-amber: #f59e0b;
+
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-neon: rgba(0, 243, 255, 0.28);
+    --border-neon-strong: rgba(0, 243, 255, 0.65);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-cyan: #00f3ff;
+
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+    --blur-glass: blur(16px);
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --shadow-cyber: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 14px;
+    line-height: 1.5;
+    user-select: none;
+}
+
+/* Кастомный кибер-скроллбар */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(6, 11, 24, 0.6);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 243, 255, 0.3);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 243, 255, 0.6);
+}
+
+/* Кодовые блоки и моноширинные бейджи */
+code, pre, .code-ip, .code-mac {
+    font-family: var(--font-mono);
+}
+
+.code-ip {
+    color: var(--neon-cyan);
+    background: rgba(0, 243, 255, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    font-size: 13px;
+}
+
+.code-mac {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* Ссылки и кнопки без дефолтного outline */
+button, input, select {
+    font-family: inherit;
+    outline: none;
+    border: none;
+}
+
+/* Индикаторы статуса */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+.status-indicator.online {
+    background: var(--neon-green);
+    box-shadow: 0 0 8px var(--neon-green-glow);
+}
+.status-indicator.offline {
+    background: var(--neon-red);
+    box-shadow: 0 0 8px var(--neon-red-glow);
+}
+
+/* Анимации */
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}

@@ -1,0 +1,557 @@
+/**
+ * NetMap 3D — Стили 3D-холста, плавающего HUD, панели оборудования и конфигурации
+ */
+
+/* ===================================================
+   3D ХОЛСТ (VIEWPORT)
+   =================================================== */
+#canvas-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #0c1529 0%, #060913 100%);
+}
+
+#canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ===================================================
+   ПЛАВАЮЩАЯ ПАНЕЛЬ ОБОРУДОВАНИЯ (DEVICE TOOLBAR)
+   =================================================== */
+.device-toolbar {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg-panel);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-neon);
+    border-radius: 30px;
+    box-shadow: var(--shadow-cyber);
+    z-index: 40;
+}
+
+.toolbar-device-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.toolbar-device-btn:hover {
+    background: rgba(0, 243, 255, 0.15);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--neon-cyan-glow);
+}
+
+.toolbar-icon {
+    font-size: 14px;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-subtle);
+    margin: 0 4px;
+}
+
+/* ===================================================
+   ПЛАВАЮЩЕЕ УПРАВЛЕНИЕ КАМЕРОЙ (CAMERA HUD)
+   =================================================== */
+.camera-controls-hud {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 40;
+}
+
+.btn-cam-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: var(--bg-panel);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-neon);
+    color: var(--text-primary);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-cyber);
+}
+
+.btn-cam-ctrl:hover {
+    background: rgba(0, 243, 255, 0.2);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    transform: scale(1.08);
+}
+
+.btn-cam-ctrl.active {
+    background: var(--neon-cyan);
+    color: #060913;
+    box-shadow: 0 0 16px var(--neon-cyan-glow);
+}
+
+/* ===================================================
+   ПЛАШКА РЕЖИМА СОЕДИНЕНИЯ (CONNECT MODE BANNER)
+   =================================================== */
+.connect-mode-banner {
+    position: absolute;
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    background: rgba(11, 24, 20, 0.95);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--neon-green);
+    border-radius: 30px;
+    box-shadow: 0 0 24px var(--neon-green-glow);
+    z-index: 45;
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.connect-mode-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--neon-green);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-cancel-connect {
+    padding: 4px 12px;
+    border-radius: 14px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--neon-red);
+    color: #fca5a5;
+    font-size: 11px;
+    cursor: pointer;
+}
+.btn-cancel-connect:hover {
+    background: var(--neon-red);
+    color: #fff;
+}
+
+/* ===================================================
+   HUD СИМУЛЯЦИИ ПАКЕТОВ (SIMULATION HUD)
+   =================================================== */
+.simulation-hud-panel {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    width: 320px;
+    background: var(--bg-panel);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-neon);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow-cyber);
+    z-index: 40;
+    transition: transform var(--transition-normal);
+}
+
+.sim-hud-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.sim-hud-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    letter-spacing: 0.5px;
+}
+
+.sim-field {
+    margin-bottom: 10px;
+}
+
+.sim-field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.sim-select {
+    width: 100%;
+    padding: 6px 10px;
+    background: var(--bg-glass-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 12px;
+}
+.sim-select:focus {
+    border-color: var(--neon-cyan);
+}
+
+.sim-hud-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+/* Телеметрия симуляции */
+.sim-telemetry-box {
+    margin-top: 14px;
+    padding: 10px;
+    background: rgba(6, 11, 24, 0.7);
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+.telemetry-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+.telemetry-row:last-child {
+    margin-bottom: 0;
+}
+.telemetry-label {
+    color: var(--text-muted);
+}
+.telemetry-val {
+    color: var(--neon-green);
+    font-weight: bold;
+}
+
+.sim-disclaimer {
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.3;
+}
+
+/* ===================================================
+   ПАНЕЛЬ НАСТРОЙКИ УЗЛА (CONFIG PANEL SLIDE-OVER)
+   =================================================== */
+.device-config-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 360px;
+    height: 100%;
+    background: rgba(10, 16, 30, 0.92);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border-left: 1px solid var(--border-neon);
+    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.6);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform var(--transition-normal);
+}
+
+.device-config-panel.open {
+    transform: translateX(0);
+}
+
+.config-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.btn-close-config {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 20px;
+    cursor: pointer;
+}
+.btn-close-config:hover {
+    color: #fff;
+}
+
+.config-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-glass-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+    transition: border-color var(--transition-fast);
+}
+.form-input:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan-glow);
+}
+.form-input.input-invalid {
+    border-color: var(--neon-red) !important;
+    box-shadow: 0 0 10px var(--neon-red-glow) !important;
+}
+
+.form-error {
+    color: var(--neon-red);
+    font-size: 11px;
+    margin-top: 4px;
+    display: none;
+}
+
+/* Координаты X и Z */
+.coords-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Список линков в панели */
+.cfg-connections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.cfg-link-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+}
+
+.cfg-link-name {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+}
+.cfg-link-sub {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.btn-disconnect-link {
+    background: transparent;
+    color: var(--neon-red);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.btn-disconnect-link:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.cfg-no-links {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 8px 0;
+}
+
+.config-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    gap: 10px;
+}
+
+/* ===================================================
+   КИБЕР-ТЕРМИНАЛ (TERMINAL DRAWER)
+   =================================================== */
+.terminal-drawer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    background: rgba(6, 11, 24, 0.94);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border-top: 1px solid var(--border-neon);
+    z-index: 42;
+    display: flex;
+    flex-direction: column;
+    transition: height var(--transition-normal);
+}
+
+.terminal-drawer.collapsed {
+    height: 36px;
+}
+
+.terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    padding: 0 16px;
+    background: rgba(10, 18, 36, 0.85);
+    border-bottom: 1px solid var(--border-subtle);
+    cursor: pointer;
+}
+
+.terminal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--neon-cyan);
+}
+
+.terminal-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.terminal-btn {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+}
+.terminal-btn:hover {
+    color: var(--text-primary);
+}
+
+.terminal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.term-line {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+.term-time { color: var(--text-muted); }
+.term-cat { color: var(--neon-cyan); font-weight: 600; }
+.term-msg { color: var(--text-primary); }
+
+.term-success .term-msg { color: var(--neon-green); }
+.term-warn .term-msg { color: var(--neon-amber); }
+.term-error .term-msg { color: var(--neon-red); }
+
+/* ===================================================
+   3D ПОДСКАЗКА НАВЕДЕНИЯ (HOVER TOOLTIP)
+   =================================================== */
+.node-tooltip {
+    position: fixed;
+    display: none;
+    padding: 8px 12px;
+    background: rgba(8, 14, 28, 0.94);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 243, 255, 0.3);
+    color: var(--text-primary);
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+    max-width: 260px;
+}
+
+.tt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.tt-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+.tt-status-dot.online { background: var(--neon-green); }
+.tt-status-dot.offline { background: var(--neon-red); }
+
+.tt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+.tt-row strong {
+    color: var(--neon-cyan);
+    font-family: var(--font-mono);
+}
+.tt-hint {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 10px;
+    color: var(--text-muted);
+}
